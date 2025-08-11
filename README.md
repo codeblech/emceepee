@@ -6,11 +6,11 @@ idk how many "mcp servers" i got left in me
 
 two broke mcp servers that process youtube videos and generate music memes because apparently that's what passes for productivity these days
 
-- youtube transcription with gemini (we're on the free tier don't judge) \
+- **youtube transcription with gemini** (we're on the free tier don't judge) \
 [https://puch.ai/mcp/HUbLKIfDQQ] \
 [https://mcp-puch-80eg.onrender.com]
 
-- music meme generator that turns your spotify/youtube/YTMusic songs into visual depression \
+- **music meme generator** that turns your spotify/youtube/YTMusic songs into visual depression \
 [https://puch.ai/mcp/ZIL5Cu4BOW] \
 [https://emceepee-music-memes.onrender.com]
 
