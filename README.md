@@ -6,13 +6,18 @@ idk how many "mcp servers" i got left in me
 
 two broke mcp servers that process youtube videos and generate music memes because apparently that's what passes for productivity these days
 
-- **youtube transcription with gemini** (we're on the free tier don't judge) \
+- youtube transcription with gemini (we're on the free tier don't judge) \
 [https://puch.ai/mcp/HUbLKIfDQQ] \
-[https://mcp-puch-80eg.onrender.com]
+[https://mcp-puch-80eg.onrender.com] \
+This tool can process any YouTube video of any length. I've nerfed it currently to 30min cap because I'm on the free tier of Gemini API.
+*How to use:* Paste any youtube link and optionally ask a question about it.
 
-- **music meme generator** that turns your spotify/youtube/YTMusic songs into visual depression \
+
+- music meme generator that turns your spotify/youtube/YTMusic songs into visual depression \
 [https://puch.ai/mcp/ZIL5Cu4BOW] \
-[https://emceepee-music-memes.onrender.com]
+[https://emceepee-music-memes.onrender.com] \
+This tool can make memes from any YouTube/Spotify/YTMusic song. 
+*How to use:* Paste one more song links and ask Puch AI to make a meme.
 
 - honourable mention: a patrick bateman walking to music generator. videos generated but mcp failed because i couuldn't send videos through mcp tools.
 
@@ -45,12 +50,6 @@ python music-memes/music_memes_mcp.py
 - automatic platform detection (it tries its best)
 - parallel processing for videos (sometimes crashes, it's fine)
 
-## why does this exist
-
-honestly i'm not sure anymore. started as a useful tool, ended up as a monument to my declining mental state
-
-the code is held together by hope and claude code answers. use at your own risk.
-
 ---
 
-*if this somehow helps you, great. if it doesn't work, that's also great because at least we're all suffering together*
+P.S. If you don't use this player, it's like seeing me lying in the street covered in blood and just walking away. No pressure.
