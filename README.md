@@ -2,6 +2,12 @@
 
 idk how many "mcp servers" i got left in me
 
+https://github.com/user-attachments/assets/3c4c3373-dd24-474b-a2ea-ab916dbdc1d0 
+
+
+https://github.com/user-attachments/assets/483c8491-9721-4b6e-b8dd-61321217f055
+
+
 ## what even is this
 
 two broke mcp servers that process youtube videos and generate music memes because apparently that's what passes for productivity these days
