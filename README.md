@@ -1,4 +1,4 @@
-# emceepee
+# emceepee - team deadhat
 
 idk how many "mcp servers" i got left in me
 
