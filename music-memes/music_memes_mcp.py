@@ -62,12 +62,21 @@ def _encode_image(image) -> ImageContent:
     Encodes a PIL Image to a format compatible with ImageContent.
     """
     import io
-
-    buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
-    img_bytes = buffer.getvalue()
-    img_obj = Image(data=img_bytes, format="png")
-    return img_obj.to_image_content()
+    try:
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        img_bytes = buffer.getvalue()
+        img_obj = Image(data=img_bytes, format="png")
+        logger.info("Image successfully encoded to ImageContent")
+        return img_obj.to_image_content()
+    except Exception as e:
+        logger.exception(f"Failed to encode image: {e}")
+        raise McpError(
+            ErrorData(
+                code=INTERNAL_ERROR,
+                message=f"Image encoding failed: {str(e)}",
+            )
+        )
 
 
 # --- Auth Provider for Puch ---
@@ -150,26 +159,46 @@ SingleMemeToolDescription = RichToolDescription(
 @mcp.tool(description=SingleMemeToolDescription.model_dump_json())
 async def generate_single_meme(
     url: Annotated[
-        AnyUrl, Field(description="Music URL for a song, album, or playlist (YouTube Music, Spotify, or YouTube)")
+        AnyUrl, Field(
+            description="Music URL for a song, album, or playlist (YouTube Music, Spotify, or YouTube)")
     ],
 ) -> ImageContent:
     """Generate a meme image from a single music URL (auto-detects platform)."""
+    logger.info(f"generate_single_meme called with url: {url}")
+    url_str = str(url)
     try:
-        logger.info(f"Generating meme from single URL: {url}")
+        try:
+            platform = detect_platform(url_str)
+            logger.info(f"Detected platform: {platform}")
+        except Exception as e:
+            logger.exception(
+                f"Platform detection failed for URL {url_str}: {e}")
+            raise McpError(
+                ErrorData(
+                    code=INTERNAL_ERROR,
+                    message=f"Platform detection failed: {str(e)}",
+                )
+            )
 
-        # Convert URL to string format
-        url_str = str(url)
-
-        # Detect platform
-        platform = detect_platform(url_str)
-        logger.info(f"Detected platform: {platform}")
-
-        # Generate meme using the generic function
-        meme_image = generate_meme_image_from_url(url_str)
+        try:
+            meme_image = generate_meme_image_from_url(url_str)
+        except Exception as e:
+            logger.exception(f"Meme generation failed for URL {url_str}: {e}")
+            raise McpError(
+                ErrorData(
+                    code=INTERNAL_ERROR,
+                    message=f"Meme generation failed: {str(e)}",
+                )
+            )
 
         if meme_image:
             logger.info(f"Successfully generated meme from URL: {url_str}")
-            return _encode_image(meme_image)
+            try:
+                return _encode_image(meme_image)
+            except Exception as e:
+                logger.exception(
+                    f"Image encoding failed for meme from URL {url_str}: {e}")
+                raise
         else:
             logger.error(f"Failed to generate meme from URL: {url_str}")
             raise McpError(
@@ -178,9 +207,8 @@ async def generate_single_meme(
                     message=f"Failed to generate meme from {platform} URL. This could be due to:\n- Invalid or unsupported URL\n- Thumbnail download failure\n- Missing background templates\n- File system issues",
                 )
             )
-
     except Exception as e:
-        logger.error(f"Error generating single meme: {e}")
+        logger.exception(f"Unhandled error in generate_single_meme: {e}")
         raise McpError(
             ErrorData(
                 code=INTERNAL_ERROR,
@@ -218,20 +246,43 @@ async def generate_multiple_memes(
     ],
 ) -> ImageContent:
     """Generate a single meme image from multiple music URLs (max 5, mixed platforms supported)."""
+    logger.info(f"generate_multiple_memes called with urls: {urls}")
+    url_strs = [str(url) for url in urls]
     try:
-        logger.info(f"Generating meme from {len(urls)} URLs: {urls}")
+        try:
+            platforms = [detect_platform(url) for url in url_strs]
+            logger.info(f"Detected platforms: {platforms}")
+        except Exception as e:
+            logger.exception(
+                f"Platform detection failed for URLs {url_strs}: {e}")
+            raise McpError(
+                ErrorData(
+                    code=INTERNAL_ERROR,
+                    message=f"Platform detection failed: {str(e)}",
+                )
+            )
 
-        # Convert URLs to string format and detect platforms
-        url_strs = [str(url) for url in urls]
-        platforms = [detect_platform(url) for url in url_strs]
-        logger.info(f"Detected platforms: {platforms}")
-
-        # Generate meme using the generic function
-        meme_image = generate_meme_image_from_urls(url_strs)
+        try:
+            meme_image = generate_meme_image_from_urls(url_strs)
+        except Exception as e:
+            logger.exception(
+                f"Meme generation failed for URLs {url_strs}: {e}")
+            raise McpError(
+                ErrorData(
+                    code=INTERNAL_ERROR,
+                    message=f"Meme generation failed: {str(e)}",
+                )
+            )
 
         if meme_image:
-            logger.info(f"Successfully generated meme from {len(url_strs)} URLs")
-            return _encode_image(meme_image)
+            logger.info(
+                f"Successfully generated meme from {len(url_strs)} URLs")
+            try:
+                return _encode_image(meme_image)
+            except Exception as e:
+                logger.exception(
+                    f"Image encoding failed for meme from URLs {url_strs}: {e}")
+                raise
         else:
             logger.error(f"Failed to generate meme from URLs: {url_strs}")
             raise McpError(
@@ -240,7 +291,6 @@ async def generate_multiple_memes(
                     message=f"Failed to generate meme from multiple URLs. This could be due to:\n- Invalid or unsupported URLs\n- Thumbnail download failures\n- Missing background templates for {len(url_strs)} images\n- File system issues",
                 )
             )
-
     except ValueError as e:
         logger.error(f"Invalid input for multiple memes: {e}")
         raise McpError(
@@ -250,7 +300,7 @@ async def generate_multiple_memes(
             )
         )
     except Exception as e:
-        logger.error(f"Error generating multiple memes: {e}")
+        logger.exception(f"Unhandled error in generate_multiple_memes: {e}")
         raise McpError(
             ErrorData(
                 code=INTERNAL_ERROR,
