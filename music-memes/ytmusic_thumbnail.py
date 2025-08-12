@@ -19,7 +19,7 @@ def get_youtube_music_video_id_by_url(url):
 
 
 # if yt link if provided, generate two videos: square and landscape
-def get_yt_music_thumbnail(url: str) -> None | str:
+def get_ytmusic_thumbnail(url: str) -> None | str:
     """Get the thumbnail of a song using its youtube music url
 
     Args:
@@ -75,6 +75,6 @@ def get_yt_music_thumbnail(url: str) -> None | str:
 
 
 if __name__ == "__main__":
-    get_yt_music_thumbnail(
+    get_ytmusic_thumbnail(
         "https://music.youtube.com/watch?v=8ECPu3iumnE&si=EnXmtbLcrYGVP1u1"
     )
