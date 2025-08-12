@@ -125,7 +125,6 @@ async def about() -> dict[str, str]:
         - Generate memes from multiple music URLs (up to 5, mixed platforms supported)
         - Automatic platform detection and thumbnail extraction
         - Image composition with random background selection
-        - Support for mixed platform URLs in a single meme
         """
     )
 
@@ -135,11 +134,11 @@ async def about() -> dict[str, str]:
 # --- Tool: Single Meme Generation ---
 SingleMemeToolDescription = RichToolDescription(
     description="""
-    Generate a meme image from a single music URL. Automatically detects platform (YouTube Music, Spotify, YouTube) 
+    Generate a meme image from a single music URL. Automatically detects platform (YouTube Music, Spotify, YouTube)
     and downloads the thumbnail, then overlays it onto a random background template.
     """,
     use_when="""
-    Use this when the user provides a single music URL (from YouTube Music, Spotify, or YouTube) 
+    Use this when the user provides a single music URL (from YouTube Music, Spotify, or YouTube)
     and wants to create a meme image from it.
     """,
     side_effects="""
@@ -160,7 +159,7 @@ async def generate_single_meme(
 
         # Convert URL to string format
         url_str = str(url)
-        
+
         # Detect platform
         platform = detect_platform(url_str)
         logger.info(f"Detected platform: {platform}")
@@ -193,12 +192,12 @@ async def generate_single_meme(
 # --- Tool: Multiple Memes Generation ---
 MultipleMemeToolDescription = RichToolDescription(
     description="""
-    Generate a single meme image from multiple music URLs (maximum 5). Automatically detects platforms 
-    (YouTube Music, Spotify, YouTube) for each URL, downloads thumbnails, and composites them onto 
+    Generate a single meme image from multiple music URLs (maximum 5). Automatically detects platforms
+    (YouTube Music, Spotify, YouTube) for each URL, downloads thumbnails, and composites them onto
     a background template designed for multiple images. Mixed platforms are supported.
     """,
     use_when="""
-    Use this when the user provides multiple music URLs (2-5) from any supported platform 
+    Use this when the user provides multiple music URLs (2-5) from any supported platform
     and wants to create a single meme image containing all of them.
     """,
     side_effects="""
