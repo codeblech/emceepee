@@ -59,3 +59,8 @@ python music-memes/music_memes_mcp.py
 ---
 
 P.S. If you don't use this player, it's like seeing me lying in the street covered in blood and just walking away. No pressure.
+
+---
+
+## Bonus
+More fun musical repos -> https://github.com/stars/codeblech/lists/music
