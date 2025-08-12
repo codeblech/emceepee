@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import logging
 from urllib.parse import urlparse
 from maker import (
     apply_overlay_transformation_image,
@@ -9,6 +10,8 @@ from maker import (
 from ytmusic_thumbnail import get_ytmusic_thumbnail
 from spotify_thumbnail import get_spotify_thumbnail
 from youtube_thumbnail import get_yt_thumbnail
+
+logger = logging.getLogger(__name__)
 
 
 def detect_platform(url):
@@ -45,14 +48,34 @@ def get_thumbnail_by_platform(url):
         str or None: Path to the downloaded thumbnail, or None if failed
     """
     platform = detect_platform(url)
+    logger.info(f"Getting thumbnail for URL: {url}, detected platform: {platform}")
 
     if platform == 'ytmusic':
-        return get_ytmusic_thumbnail(url)
+        logger.info("Calling get_ytmusic_thumbnail")
+        result = get_ytmusic_thumbnail(url)
+        if result:
+            logger.info(f"YT Music thumbnail downloaded successfully: {result}")
+        else:
+            logger.error(f"YT Music thumbnail download failed for URL: {url}")
+        return result
     elif platform == 'spotify':
-        return get_spotify_thumbnail(url)
+        logger.info("Calling get_spotify_thumbnail")
+        result = get_spotify_thumbnail(url)
+        if result:
+            logger.info(f"Spotify thumbnail downloaded successfully: {result}")
+        else:
+            logger.error(f"Spotify thumbnail download failed for URL: {url}")
+        return result
     elif platform == 'youtube':
-        return get_yt_thumbnail(url)
+        logger.info("Calling get_yt_thumbnail")
+        result = get_yt_thumbnail(url)
+        if result:
+            logger.info(f"YouTube thumbnail downloaded successfully: {result}")
+        else:
+            logger.error(f"YouTube thumbnail download failed for URL: {url}")
+        return result
     else:
+        logger.error(f"Unknown platform for URL: {url}")
         return None
 
 
@@ -66,9 +89,14 @@ def get_random_background(num_overlays):
     Returns:
         str or None: Path to the background image, or None if not found
     """
-    backgrounds_directory = os.path.join("music-memes", "assets", "background", str(num_overlays))
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backgrounds_directory = os.path.join(script_dir, "assets", "background", str(num_overlays))
+    
+    logger.info(f"Looking for backgrounds in: {backgrounds_directory}")
 
     if not os.path.exists(backgrounds_directory):
+        logger.error(f"Background directory does not exist: {backgrounds_directory}")
         return None
 
     background_files = [
@@ -96,18 +124,33 @@ def generate_meme_image_from_url(url):
     Returns:
         PIL.Image: Generated meme image, or None if generation failed
     """
+    logger.info(f"Generating meme for URL: {url}")
+    
     # Get thumbnail from URL (auto-detects platform)
     overlay_path = get_thumbnail_by_platform(url)
     if not overlay_path:
+        logger.error(f"Failed to get thumbnail for URL: {url}")
         return None
+    logger.info(f"Got overlay path: {overlay_path}")
 
     # Get random background for single image
     background_path = get_random_background(1)
     if not background_path:
+        logger.error("Failed to get random background image")
         return None
+    logger.info(f"Got background path: {background_path}")
 
     # Generate meme and return PIL Image
-    return apply_overlay_transformation_image(background_path, overlay_path)
+    try:
+        result = apply_overlay_transformation_image(background_path, overlay_path)
+        if result:
+            logger.info("Meme image generated successfully")
+        else:
+            logger.error("apply_overlay_transformation_image returned None")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to apply overlay transformation: {e}")
+        return None
 
 
 def generate_meme_image_from_ytmusic_url(ytmusic_url):

@@ -8,39 +8,49 @@ import os
 import requests
 from io import BytesIO
 from PIL import Image
+import logging
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 
 def get_spotify_thumbnail(url: str) -> None | str:
-    # spotify = spotipy.Spotify(auth_manager=SpotifyOAuth())
-    spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
-    result = spotify.track(url)
+    logger.info(f"Starting Spotify thumbnail extraction for URL: {url}")
+    try:
+        # spotify = spotipy.Spotify(auth_manager=SpotifyOAuth())
+        spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials())
+        result = spotify.track(url)
 
-    thumbnail_url = result["album"]["images"][0]["url"]
-    id = result["album"]["artists"][0]["id"]
-    print(id)
-    save_name = id
-    save_path = os.path.join(
-        "./music-memes/assets/thumbnails/spotify", f"{save_name}.jpg"
-    )
-    os.makedirs("./music-memes/assets/thumbnails/spotify", exist_ok=True)
+        thumbnail_url = result["album"]["images"][0]["url"]
+        id = result["album"]["artists"][0]["id"]
+        logger.info(f"Found artist ID: {id}, thumbnail URL: {thumbnail_url}")
+        save_name = id
+    except Exception as e:
+        logger.error(f"Failed to get Spotify track info: {e}")
+        return None
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    thumbnails_dir = os.path.join(script_dir, "assets", "thumbnails", "spotify")
+    save_path = os.path.join(thumbnails_dir, f"{save_name}.jpg")
+    os.makedirs(thumbnails_dir, exist_ok=True)
 
     # check if this thumbnail is already available, and return it if it exists
-    try:
-        with open(save_path) as im:
-            print("using already generated spotify thumbnail")
+    if os.path.exists(save_path):
+        logger.info(f"Using existing Spotify thumbnail: {save_path}")
         return save_path
-    except:
-        pass
 
-    rr = requests.get(thumbnail_url)
-    if rr.status_code != 200:
-        return None
-    with Image.open(BytesIO(rr.content)) as im:
-        try:
+    try:
+        logger.info(f"Downloading Spotify thumbnail from: {thumbnail_url}")
+        rr = requests.get(thumbnail_url)
+        if rr.status_code != 200:
+            logger.error(f"Failed to download thumbnail. Status code: {rr.status_code}")
+            return None
+        
+        with Image.open(BytesIO(rr.content)) as im:
             # Crop from center to make it square, then resize to 512x512
             width, height = im.size
+            logger.info(f"Original image dimensions: {width}x{height}")
             size = min(width, height)
             left = (width - size) // 2
             top = (height - size) // 2
@@ -50,9 +60,11 @@ def get_spotify_thumbnail(url: str) -> None | str:
             cropped_im = im.crop((left, top, right, bottom))
             resized_im = cropped_im.resize((512, 512), Image.Resampling.LANCZOS)
             resized_im.save(save_path, format="JPEG")
+            logger.info(f"Spotify thumbnail saved successfully to: {save_path}")
             return save_path
-        except:
-            return None
+    except Exception as e:
+        logger.error(f"Failed to process Spotify thumbnail: {e}")
+        return None
 
 
 if __name__ == "__main__":

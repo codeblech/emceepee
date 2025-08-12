@@ -3,6 +3,9 @@ from PIL import Image
 import os
 from io import BytesIO
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 # youtube music thumbnails can also be grabbed in this manner
 
@@ -31,29 +34,36 @@ def get_yt_thumbnail(url: str) -> None | str:
     Returns:
         str | None: path to the downloaded thumbail image file
     """
+    logger.info(f"Starting YouTube thumbnail extraction for URL: {url}")
     video_id: str = get_youtube_video_id_by_url(url)
+    if not video_id:
+        logger.error(f"Could not extract video ID from URL: {url}")
+        return None
+    logger.info(f"Extracted video ID: {video_id}")
     save_name = video_id
-    save_path = os.path.join(
-        "./music-memes/assets/thumbnails/youtube", f"{save_name}.jpg"
-    )
-    os.makedirs("./music-memes/assets/thumbnails/youtube", exist_ok=True)
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    thumbnails_dir = os.path.join(script_dir, "assets", "thumbnails", "youtube")
+    save_path = os.path.join(thumbnails_dir, f"{save_name}.jpg")
+    os.makedirs(thumbnails_dir, exist_ok=True)
 
     # check if this thumbnail is already available, and return it if it exists
-    try:
-        with open(save_path) as im:
-            print("using already generated youtube thumbnail")
+    if os.path.exists(save_path):
+        logger.info(f"Using existing YouTube thumbnail: {save_path}")
         return save_path
-    except:
-        pass
     thumbnail_url: str = "https://img.youtube.com/vi/" + video_id + "/maxresdefault.jpg"
+    logger.info(f"Downloading YouTube thumbnail from: {thumbnail_url}")
 
-    rr = requests.get(thumbnail_url)
-    if rr.status_code != 200:
-        return None
-    with Image.open(BytesIO(rr.content)) as im:
-        try:
+    try:
+        rr = requests.get(thumbnail_url)
+        if rr.status_code != 200:
+            logger.error(f"Failed to download thumbnail. Status code: {rr.status_code}")
+            return None
+        
+        with Image.open(BytesIO(rr.content)) as im:
             # Crop from center to make it square, then resize to 512x512
             width, height = im.size
+            logger.info(f"Original image dimensions: {width}x{height}")
             size = min(width, height)
             left = (width - size) // 2
             top = (height - size) // 2
@@ -63,9 +73,11 @@ def get_yt_thumbnail(url: str) -> None | str:
             cropped_im = im.crop((left, top, right, bottom))
             resized_im = cropped_im.resize((512, 512), Image.Resampling.LANCZOS)
             resized_im.save(save_path, format="JPEG")
+            logger.info(f"YouTube thumbnail saved successfully to: {save_path}")
             return save_path
-        except:
-            return None
+    except Exception as e:
+        logger.error(f"Failed to process YouTube thumbnail: {e}")
+        return None
 
 
 if __name__ == "__main__":
