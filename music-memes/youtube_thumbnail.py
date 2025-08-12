@@ -25,8 +25,8 @@ def get_youtube_video_id_by_url(url):
 
 
 # if yt link if provided, generate two videos: square and landscape
-def get_yt_thumbnail(url: str) -> None | str:
-    """Get the thumbnail of a song using its youtube music url
+def get_yt_thumbnail(url: str) -> str | None:
+    """Get the thumbnail of a song using its youtube url
 
     Args:
         url (str): YouTube url to the song
@@ -59,7 +59,7 @@ def get_yt_thumbnail(url: str) -> None | str:
         if rr.status_code != 200:
             logger.error(f"Failed to download thumbnail. Status code: {rr.status_code}")
             return None
-        
+
         with Image.open(BytesIO(rr.content)) as im:
             # Crop from center to make it square, then resize to 512x512
             width, height = im.size
@@ -69,16 +69,18 @@ def get_yt_thumbnail(url: str) -> None | str:
             top = (height - size) // 2
             right = left + size
             bottom = top + size
-            
+
             cropped_im = im.crop((left, top, right, bottom))
             resized_im = cropped_im.resize((512, 512), Image.Resampling.LANCZOS)
             resized_im.save(save_path, format="JPEG")
-            logger.info(f"YouTube thumbnail saved successfully to: {save_path}")
+            logger.info(f"YouTube Music thumbnail saved successfully to: {save_path}")
             return save_path
     except Exception as e:
-        logger.error(f"Failed to process YouTube thumbnail: {e}")
+        logger.error(f"Failed to process YouTube Music thumbnail: {e}")
         return None
 
 
 if __name__ == "__main__":
-    get_yt_thumbnail("https://www.youtube.com/watch?v=6CHs4x2uqcQ")
+    get_yt_thumbnail(
+        ""
+    )
