@@ -16,13 +16,15 @@ two broke mcp servers that process youtube videos and generate music memes becau
 [https://puch.ai/mcp/HUbLKIfDQQ] \
 [https://mcp-puch-80eg.onrender.com/mcp/] \
 This tool can process any YouTube video of any length. I've nerfed it currently to 30min cap because I'm on the free tier of Gemini API.
+
 *How to use:* Paste any youtube link and optionally ask a question about it.
 
 
 - music meme generator that turns your spotify/youtube/YTMusic songs into visual depression \
 [https://puch.ai/mcp/ZIL5Cu4BOW] \
 [https://emceepee-music-memes.onrender.com/mcp/] \
-This tool can make memes from any YouTube/Spotify/YTMusic song. 
+This tool can make memes from any YouTube/Spotify/YTMusic song.
+
 *How to use:* Paste one more song links and ask Puch AI to make a meme.
 
 - honourable mention: a patrick bateman walking to music generator. videos generated but mcp failed because i couuldn't send videos through mcp tools.
