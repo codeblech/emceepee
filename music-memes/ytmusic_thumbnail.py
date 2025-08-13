@@ -37,7 +37,7 @@ def get_ytmusic_thumbnail(url: str) -> None | str:
     save_name = video_id
     # Get the directory where this script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    thumbnails_dir = os.path.join(script_dir, "assets", "thumbnails", "youtube")
+    thumbnails_dir = os.path.join(script_dir, "assets", "thumbnails", "ytmusic")
     save_path = os.path.join(thumbnails_dir, f"{save_name}.jpg")
     os.makedirs(thumbnails_dir, exist_ok=True)
 
